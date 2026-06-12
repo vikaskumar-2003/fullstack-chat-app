@@ -8,18 +8,20 @@ import jwt from "jsonwebtoken";
 export const register = asyncHandler(async (req, res, next) => {
   const { fullname, username, password, gender } = req.body;
 
-  if (!fullname || !username || !password || !gender) {
+  if (!fullname || !username || !password || !gender  ) {
     return next(new errorHandler("all field are required", 400));
   }
 
   const existUser = await User.findOne({ username });
 
+  console.log("exist user",existUser);
+  
   if (existUser) {
     return next(new errorHandler("user already exists", 400));
   }
 
   const avatarType = gender === "male" ? "boy" : "girl";
-  const avatar = `https://avatar.iran.liara.run/punblic/${avatarType}?username=${username}`;
+  const avatar = `https://avatar.iran.liara.run/public/${avatarType}?username=${username}`;
 
   const hashPassword = await bcrypt.hash(password, 10);
 
@@ -34,13 +36,14 @@ export const register = asyncHandler(async (req, res, next) => {
   const token = jwt.sign({ _id: newUser._id }, process.env.JWT_SECRET_KEY, {
     expiresIn: "1d",
   });
+  console.log(process.env.JWT_SECRET_KEY);
 
   res
     .status(200)
     .cookie("token",token,{
       expires: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000),
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: true,
       sameSite: "None",
     })
     .json({
@@ -136,3 +139,14 @@ export const logout = asyncHandler(async(req,res,next) => {
 
 })
 
+
+export const getOtherUser = asyncHandler(async (req, res, next) => {
+  
+  const otherUsers = await User.find({ _id: { $ne: req.user._id } })
+  
+  res.status(200).json({
+    success: true,
+    responseData:otherUsers
+  })
+
+})

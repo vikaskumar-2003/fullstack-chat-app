@@ -8,11 +8,12 @@ import Login from './pages/authentication/Login.jsx'
 import Signup from './pages/authentication/Signup.jsx'
 import {Provider} from "react-redux"
 import { store } from './store/store.js'
+import ProtectedRoutes from './component/ProtectedRoutes.jsx'
 
 const router = createBrowserRouter([
 
   {
-      path:"/",element:<Home/>
+      path:"/",element: <ProtectedRoutes><Home/></ProtectedRoutes>
   },
     {
       path:"/login",element:<Login/>

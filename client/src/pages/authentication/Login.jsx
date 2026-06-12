@@ -1,19 +1,40 @@
-import React, { useState } from "react";
-import {Link} from "react-router-dom"
+import  { useState } from "react";
+import {Link, useNavigate} from "react-router-dom"
 import { FaUser } from "react-icons/fa";
 import { HiMiniKey } from "react-icons/hi2";
+import toast from "react-hot-toast";
+import {useDispatch} from "react-redux"
+import { loginUserThunk } from "../../store/slice/user/user.thunk";
 
 const Login = () => {
 
+  const dispatch=useDispatch()
   const [loginData, setLoginData] = useState({
     username: "",
     password:""
    })
 
+  const navigate=useNavigate()
+
+   
+
   const handleChange = (e) => {
     let{name,value}=e.target
     setLoginData({ ...loginData, [name]: value })
     console.log(loginData);
+    
+  }
+
+  const handleLogin = async() => {
+   
+    const response = await dispatch(loginUserThunk(loginData))
+    console.log("form response", response);
+
+    if (response.payload.success === true) {
+       toast.success("success")
+      navigate("/")
+    }
+    
     
   }
 
@@ -66,7 +87,7 @@ const Login = () => {
           At least one uppercase letter
         </p> */}
 
-        <button className="btn btn-primary ">Primary</button>
+        <button className="btn btn-primary " onClick={handleLogin} >Login</button>
         <p>Don't have an account? <Link to="/signup" >Sign up</Link> </p>
       </div>
      
